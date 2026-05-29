@@ -4,7 +4,6 @@
 This lab introduces core principles of Real-Time Systems Engineering through a hands-on self-driving simulation. Participants will build a Python-based control system that:
 - Receives real-time camera input from a Unity environment
 - Processes perception using computer vision / ML
-- Trains a Behavioural Cloning Model
 - Sends control commands under strict timing constraints
 
 ## Project Structure
