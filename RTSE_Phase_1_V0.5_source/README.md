@@ -1,4 +1,4 @@
-# Hack2Drive 2026 - Phase 1
+# SPEEDTRIALS2D 2026 - Phase 1
 
 ## Technical Setup
 - How to control the Unity environment using the Python communication script
