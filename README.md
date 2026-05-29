@@ -41,32 +41,6 @@ This lab introduces core principles of Real-Time Systems Engineering through a h
 
 ---
 
-## Phase 2
-![Phase 2 Demo](./Phase_2_game.gif)
-
-### Technical Setup
-- Introduction to self-driving
-- Explaining Behavioural Cloning
-
-### Game Rules
-**Objective:** Navigate from Point A to Point B safely and efficiently.
-
-#### Health System
-Cars start with 5 health points (HP). Each violation results in −1 HP.
-
-#### Violations
-- Collision with obstacle/NPC
-- Running a red light
-- Ignoring a stop sign
-- Not stopping for pedestrians at crossings
-- Not giving priority to a police car
-- Ignoring police officer signals
-
----
-
-## 24 Hours Hackathon
-**Introduction:** On ??/??/26, a new challenge will be revealed based on Phase 1 and Phase 2. The participants have 24 hours to submit their code / result (From 8 pm to 8 pm, Lab open 24 hours). A quiz assessing the lab content will be conducted during the 24 hours hackathon, accessible for 1 hour at a random hour of the last 8 hours of the hackathon.
-
 ### Reveal at the start of Hackathon:
 - **Stage 1:** Tournament style for 1v1 Phase 1 game (multiplayer + new tokens)
 - **Stage 2:** The top 10 teams go to Phase 2 game (multiplayer + new challenge)
