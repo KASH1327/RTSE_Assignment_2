@@ -40,7 +40,3 @@ This lab introduces core principles of Real-Time Systems Engineering through a h
 - The brightness decreases under 50%. All tokens become Yellow until the light is turned ON. While light ON, green tokens increase speed by +5% instead.
 
 ---
-
-### Reveal at the start of Hackathon:
-- **Stage 1:** Tournament style for 1v1 Phase 1 game (multiplayer + new tokens)
-- **Stage 2:** The top 10 teams go to Phase 2 game (multiplayer + new challenge)
