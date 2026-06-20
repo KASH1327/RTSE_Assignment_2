@@ -198,35 +198,109 @@ def read_front_camera_task():
 def read_back_camera_task():
     read_single_camera(back_camera_sock, "Back Camera", 'latest_back_frame')
 
+def tap_left():
+    with data_lock:
+        shared_data['steering_input'] = -1.0
+
+
+def tap_right():
+    with data_lock:
+        shared_data['steering_input'] = 1.0
+
 def processing_task():
-    #This is where you write your image processing code to decide how to control the car
-    #You can use libraries like OpenCV to process the image
-    #There is no limtation to the complexity of the processing task, you can use any libraries you want
-    #Remember to use the shared_data to get the latest frame
+
     with data_lock:
         front_frame = shared_data['latest_front_frame']
-    
-    if front_frame is not None:
-        # write your processing here
-        pass
+
+    if front_frame is None:
+        return
+
+    hsv = cv2.cvtColor(front_frame, cv2.COLOR_BGR2HSV)
+
+    def mask_red():
+        r1 = cv2.inRange(hsv, np.array([0, 100, 100]), np.array([10, 255, 255]))
+        r2 = cv2.inRange(hsv, np.array([160, 100, 100]), np.array([180, 255, 255]))
+        return r1 | r2
+
+    red_mask = mask_red()
+
+    def get_largest_x(mask):
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            return None
+
+        c = max(contours, key=cv2.contourArea)
+        if cv2.contourArea(c) < 300:
+            return None
+
+        M = cv2.moments(c)
+        if M["m00"] == 0:
+            return None
+
+        return int(M["m10"] / M["m00"])
+
+    red_x = get_largest_x(red_mask)
+
+    w = front_frame.shape[1]
+
+    # =========================
+    # 5-LANE DIVISION
+    # =========================
+    lane_width = w / 5
+
+    def get_lane(x):
+        return int(x // lane_width) + 1  # Lane 1 → 5
+
+    steering = 0.0
+
+    # =========================
+    # RED AVOIDANCE (FIXED)
+    # =========================
+    if red_x is not None:
+
+        red_lane = get_lane(red_x)
+
+        # If in Lane 4 → go strongly to Lane 3
+        if red_lane == 4:
+            steering = -1.0   # hard left escape
+
+        # If in Lane 5 → also go left
+        elif red_lane == 5:
+            steering = -1.0
+
+        # If in Lane 3 → slight correction only
+        elif red_lane == 3:
+            steering = -0.5
+
+    else:
+        # no red → stay stable center
+        steering = 0.0
+
+    with data_lock:
+        shared_data['steering_input'] = steering
+        shared_data['acceleration_input'] = 1.0
 
 def send_controls_task():
-    #This is where you send the control commands to the car using the control_conn
+
     global control_conn
+
     if control_conn is None:
         return
-    
-    #these are the variables used to control the car
-    #steering_input: -1.0 to 1.0 (left to right)
-    #acceleration_input: -1.0 to 1.0 (reverse to forward)
-    #this example always accelerate forward
-    steering_input = 0.0
-    acceleration_input = 1.0
+
+    with data_lock:
+        steering_input = shared_data['steering_input']
+        acceleration_input = shared_data['acceleration_input']
 
     try:
-        # Pack and send the control command
-        data = struct.pack('ff', steering_input, acceleration_input)
+
+        data = struct.pack(
+            'ff',
+            steering_input,
+            acceleration_input
+        )
+
         control_conn.sendall(data)
+
     except Exception as e:
         print(f"Control send error: {e}")
         control_conn = None
